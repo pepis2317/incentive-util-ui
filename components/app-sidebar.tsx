@@ -14,6 +14,7 @@ import {
   SidebarMenu,
   SidebarMenuButton
 } from "@/components/ui/sidebar"
+import { Suspense } from "react"
 
 const items = [
   { title: "Home", href: "/", icon: Home },
@@ -22,35 +23,55 @@ const items = [
   { title: "Items", href: "/items", icon: Package },
 ]
 
-export function AppSidebar() {
+function SidebarNav() {
   const pathname = usePathname()
-  const { setOpenMobile } = useSidebar()
 
   return (
+    <SidebarMenu>
+      {items.map((item) => (
+        <SidebarMenuButton
+          key={item.href}
+          isActive={pathname === item.href}
+          render={<Link href={item.href} />}
+        >
+          <item.icon />
+          <span>{item.title}</span>
+        </SidebarMenuButton>
+      ))}
+    </SidebarMenu>
+  )
+}
+
+function SidebarNavFallback() {
+  return (
+    <SidebarMenu>
+      {items.map((item) => (
+        <SidebarMenuButton
+          key={item.href}
+          render={<Link href={item.href} />}
+        >
+          <item.icon />
+          <span>{item.title}</span>
+        </SidebarMenuButton>
+      ))}
+    </SidebarMenu>
+  )
+}
+
+export function AppSidebar() {
+  return (
     <Sidebar>
-      <SidebarHeader>Incentive Util</SidebarHeader>
+      <SidebarHeader>{/* your header */}</SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuButton
-                  onClick={() => setOpenMobile(false)}
-                  key={item.href}
-                  isActive={pathname === item.href}
-                  render={<Link href={item.href} />}
-                >
-                  <item.icon />
-                  <span>{item.title}</span>
-                </SidebarMenuButton>
-              ))}
-            </SidebarMenu>
+            <Suspense fallback={<SidebarNavFallback />}>
+              <SidebarNav />
+            </Suspense>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   )
-}
-
-
+} 

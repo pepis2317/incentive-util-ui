@@ -1,38 +1,45 @@
 import { AppBreadcrumb } from "@/components/app-breadcrumb";
 import { AddCustomerDialog } from "@/components/customers/add-customer-dialog";
-import { customerColumns, Customer } from "@/components/customers/customer-columns";
+import { customerColumns } from "@/components/customers/customer-columns";
 import { DataTable } from "@/components/data-table";
 import { TableSearch } from "@/components/table-search";
-import { customerSearch } from "./customer-search";
+import { getCustomers } from "../api/endpoints";
+import { Suspense } from "react";
+import { GetCustomerParams } from "../api/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Toaster } from "@/components/ui/toast";
 
-async function getData(): Promise<Customer[]> {
-  return [
-    {
-      id: "C01",
-      name: "test customer",
-      type: "test type",
-      created_at: 1794279685,
-      updated_at: null
-    },
-    {
-      id: "C02",
-      name: "test customer 2",
-      type: "test type",
-      created_at: 1794279726,
-      updated_at: 1794279685
-    },
-  ]
-}
-export default async function Customers() {
-  const data = await getData()
+async function CustomerContent({ searchParams }: { searchParams: Promise<GetCustomerParams> }) {
+  const params = await searchParams
+  const data = await getCustomers(params)
   return (
     <div>
-      <AppBreadcrumb />
       <div className="flex gap-2">
-        <TableSearch onSearch={customerSearch} />
+        <TableSearch query="customer_query" />
         <AddCustomerDialog />
       </div>
-      <DataTable columns={customerColumns} data={data} />
+      <DataTable columns={customerColumns} data={data.customers} rowCount={data.total} />
+      <Toaster />
+    </div>
+  )
+}
+function CustomersSkeleton() {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="w-xs h-10" />
+      <Skeleton className="w-lg h-16" />
+      <Skeleton className="w-full h-52" />
+    </div>
+  )
+}
+
+export default function Customers({ searchParams }: { searchParams: Promise<GetCustomerParams> }) {
+  return (
+    <div>
+      <Suspense fallback={<CustomersSkeleton />}>
+        <AppBreadcrumb />
+        <CustomerContent searchParams={searchParams} />
+      </Suspense>
     </div>
   )
 }

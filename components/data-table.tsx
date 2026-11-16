@@ -12,12 +12,14 @@ import {
 } from "@/components/ui/table"
 
 import { type DataTableFeatures, features } from "./data-table-features"
-import { ArrowLeft, ArrowRight } from "lucide-react"
+import { ArrowLeft, ArrowRight, GripVertical } from "lucide-react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 
 interface DataTableProps<TData extends RowData> {
   columns: ColumnDef<DataTableFeatures, TData>[]
   data: TData[]
+  rowCount?: number
   enablePagination?: boolean,
   getRowId?: (row: TData, index: number) => string
 }
@@ -30,28 +32,51 @@ function ResizeHandle<TData extends RowData>(props: { header: Header<typeof feat
     <div
       aria-hidden="true"
       className={cn(
-        "absolute inset-y-0 end-0 w-1 cursor-col-resize touch-none select-none bg-border opacity-0 hover:opacity-100",
-        header.column.getIsResizing() && "bg-primary opacity-100"
+        "absolute bg-background h-full inset-e-0 top-0 cursor-col-resize touch-none select-none opacity-70 hover:opacity-100 hover:bg-accent hover:shadow",
+        header.column.getIsResizing() && "bg-border"
       )}
       onMouseDown={handler}
       onTouchStart={handler}
-    />
+    >
+      <div className="w-full h-full mr-1 flex items-center justify-center">
+        <GripVertical size={16} />
+      </div>
+    </div>
   );
 }
 
 export function DataTable<TData extends RowData>({
   columns,
   data,
+  rowCount,
   enablePagination = true,
   getRowId
 }: DataTableProps<TData>) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const pagination = {
+    pageIndex: Math.max(Number(searchParams.get("page") ?? 1) - 1, 0),
+    pageSize: Number(searchParams.get("page_size") ?? 10)
+  }
+
   const table = useTable({
     features,
     columnResizeMode: "onChange",
-    manualPagination: !enablePagination,
+    manualPagination: true,
     data,
     columns,
-    getRowId
+    getRowId,
+    rowCount,
+    state: { pagination },
+    onPaginationChange: (updater) => {
+      const next = typeof updater == "function" ? updater(pagination) : updater
+      const params = new URLSearchParams(searchParams.toString())
+      params.set("page", String(next.pageIndex + 1))
+      params.set("page_size", String(next.pageSize))
+      router.push(`${pathname}?${params.toString()}`)
+    }
   })
 
   return (
@@ -84,7 +109,7 @@ export function DataTable<TData extends RowData>({
               <TableRow key={row.id}>
                 {row.getAllCells().map((cell) => (
                   <TableCell
-                    className="truncate align-top"
+                    className="truncate align-top border-r"
                     key={cell.id}
                     style={{ width: cell.column.getSize() }}
                   >

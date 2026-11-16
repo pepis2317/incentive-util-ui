@@ -2,7 +2,8 @@ import { z } from "zod"
 
 export const itemDiscountSchema = z.object({
   discount_type: z.string().min(1),
-  discount_value: z.number(),
+  discount_value: z.number().positive(),
+  discount_step: z.number().int().min(1),
 })
 
 export const recordAddSchema = z.object({
@@ -31,7 +32,6 @@ export const recordAddSchema = z.object({
           return
         }
 
-        // flag both the duplicate and the first occurrence
         for (const i of [firstIndex, index]) {
           ctx.addIssue({
             code: "custom",

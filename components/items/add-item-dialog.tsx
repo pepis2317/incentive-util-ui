@@ -7,6 +7,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Package } from "lucide-react"
+import { FormProvider, useForm } from "react-hook-form"
+import { AddItemRequest } from "@/app/api/types"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { editItemSchema } from "./create-edit-item-schema"
+import { useRouter } from "next/navigation"
+import { toast, Toaster } from "../ui/toast"
+import { Spinner } from "../ui/spinner"
 
 export function AddItemDialog() {
   const [open, setOpen] = useState(false)
@@ -28,63 +35,120 @@ export function AddItemDialog() {
 }
 
 function AddItemForm({ onSuccess }: { onSuccess: () => void }) {
-  const [name, setName] = useState<string>("")
-  const [type, setType] = useState<string>("")
-  const [brand, setBrand] = useState<string>("")
-  const [unit, setUnit] = useState<string>("")
-  const [sellPrice, setSellPrice] = useState<number>(0)
+  const [isSubmitting, setSubmitting] = useState(false)
+  const form = useForm<AddItemRequest>({
+    resolver: zodResolver(editItemSchema)
+  })
+  const router = useRouter()
 
-  const handleSubmit = (e: React.SubmitEvent) => {
-    e.preventDefault()
-    // TODO: save { name, type } here using tools from tanstack
-    onSuccess()
+  const onValid = async (data: AddItemRequest) => {
+    const payload = {
+      id: data.id,
+      name: data.name,
+      type: data.type,
+      brand: data.brand,
+      unit: data.unit,
+      base_price: data.base_price,
+      sell_price: data.sell_price
+    }
+    setSubmitting(true)
+    try {
+      const res = await fetch("/api/items", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.error ?? "Failed to add item");
+      }
+
+      toast.add({
+        title: "Added item data"
+      })
+
+      router.refresh()
+      setSubmitting(false)
+      onSuccess();
+    } catch (e) {
+      console.error(e);
+      toast.add({
+        title: "Error",
+        description: e instanceof Error ? e.message : "Something went wrong. Please try again.",
+      });
+      setSubmitting(false)
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="type">Type</Label>
-        <Input
-          id="type"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="brand">Brand</Label>
-        <Input
-          id="brand"
-          value={brand}
-          onChange={(e) => setBrand(e.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="unit">Unit</Label>
-        <Input
-          id="unit"
-          value={unit}
-          onChange={(e) => setUnit(e.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="type">Price</Label>
-        <Input
-          id="sell_price"
-          type="number"
-          value={sellPrice}
-          onChange={(e) => setSellPrice(Number(e.target.value))}
-        />
-      </div>
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Id</Label>
+          <Input
+            id="id"
+            aria-invalid={!!form.formState.errors.id}
+            {...form.register("id")}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            aria-invalid={!!form.formState.errors.name}
+            {...form.register("name")}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="type">Type</Label>
+          <Input
+            id="type"
+            aria-invalid={!!form.formState.errors.type}
+            {...form.register("type")}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="brand">Brand</Label>
+          <Input
+            id="brand"
+            aria-invalid={!!form.formState.errors.brand}
+            {...form.register("brand")}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="unit">Unit</Label>
+          <Input
+            id="unit"
+            aria-invalid={!!form.formState.errors.unit}
+            {...form.register("unit")}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="base_price">Base Price</Label>
+          <Input
+            id="base_price"
+            type="number"
+            aria-invalid={!!form.formState.errors.base_price}
+            {...form.register("base_price", { valueAsNumber: true })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="type">Sell Price</Label>
+          <Input
+            id="sell_price"
+            type="number"
+            aria-invalid={!!form.formState.errors.sell_price}
+            {...form.register("sell_price", { valueAsNumber: true })}
+          />
+        </div>
 
-      <Button type="submit">Save</Button>
-    </form>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Spinner />}
+          {isSubmitting ? "Saving..." : "Add new item"}
+        </Button>
+      </form>
+      <Toaster />
+    </FormProvider>
   )
 }

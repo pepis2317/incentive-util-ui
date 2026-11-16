@@ -4,14 +4,7 @@ import { createColumnHelper } from "@tanstack/react-table"
 import { EditCustomerDialog } from "./edit-customer-dialog"
 import { DataTableFeatures } from "../data-table-features"
 import { DataTableColumnHeader } from "../data-table-column-header"
-
-export type Customer = {
-  id: string
-  name: string
-  type: string
-  created_at: number
-  updated_at: number | null
-}
+import { Customer } from "@/app/api/types"
 
 const columnHelper = createColumnHelper<DataTableFeatures, Customer>()
 
@@ -26,11 +19,6 @@ export const customerColumns = columnHelper.columns([
   columnHelper.accessor("name", {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
-    )
-  }),
-  columnHelper.accessor("type", {
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Type" />
     )
   }),
   columnHelper.accessor("created_at", {

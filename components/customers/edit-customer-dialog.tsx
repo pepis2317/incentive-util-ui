@@ -5,22 +5,21 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Pencil } from "lucide-react"
-import { Customer } from "./customer-columns"
+import { Customer } from "@/app/api/types"
+import { FormProvider, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { editCustomerSchema } from "./create-edit-customer-schema"
+import { EditCustomerRequest } from "@/app/api/types"
+import { toast, Toaster } from "../ui/toast"
+import { useRouter } from "next/navigation"
+import { Spinner } from "../ui/spinner"
 
 export function EditCustomerDialog({ customer }: { customer: Customer }) {
   const [open, setOpen] = useState(false)
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button variant="outline" size="sm" />}>
+      <DialogTrigger render={<Button size="icon-sm" />}>
         <Pencil />
       </DialogTrigger>
       <DialogContent>
@@ -36,46 +35,73 @@ export function EditCustomerDialog({ customer }: { customer: Customer }) {
   )
 }
 
-const CUSTOMER_TYPES = ["individual", "business", "enterprise"]
-
 function EditCustomerForm({ customer, onSuccess }: { customer: Customer, onSuccess: () => void }) {
-  const [name, setName] = useState(customer.name)
-  const [type, setType] = useState(customer.type)
+  const [isSubmitting, setSubmitting] = useState(false)
+  const form = useForm<EditCustomerRequest>({
+    resolver: zodResolver(editCustomerSchema),
+    defaultValues: {
+      id: customer.id,
+      name: customer.name,
+      type_id: customer.type_id
+    }
+  })
 
-  const handleSubmit = (e: React.SubmitEvent) => {
-    e.preventDefault()
-    // TODO: save { name, type } here using tools from tanstack
-    onSuccess()
+  const router = useRouter()
+
+  const onValid = async (data: EditCustomerRequest) => {
+    const payload = {
+      id: data.id,
+      type_id: data.type_id,
+      name: data.name
+    }
+    setSubmitting(true)
+    try {
+      const res = await fetch("/api/customers", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.error ?? "Failed to update customer");
+      }
+
+      toast.add({
+        title: "Updated customer data"
+      })
+      router.refresh()
+      setSubmitting(false)
+      onSuccess();
+    } catch (e) {
+      console.error(e);
+      toast.add({
+        title: "Update error",
+        description: e instanceof Error ? e.message : "Something went wrong. Please try again.",
+      });
+      setSubmitting(false)
+    }
   }
 
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            aria-invalid={!!form.formState.errors.name}
+            {...form.register("name")}
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label>Type</Label>
-        <Select value={type} onValueChange={(v) => v && setType(v)}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a type" />
-          </SelectTrigger>
-          <SelectContent>
-            {CUSTOMER_TYPES.map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Button type="submit">Save</Button>
-    </form>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Spinner />}
+          {isSubmitting ? "Saving..." : "Save changes"}
+        </Button>
+      </form>
+      <Toaster />
+    </FormProvider>
   )
 }

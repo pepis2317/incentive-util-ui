@@ -3,28 +3,17 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import { DataTableFeatures } from "../data-table-features"
 import { DataTableColumnHeader } from "../data-table-column-header"
-import { EditInvoiceDialog } from "./edit-invoice-dialog"
+import { Button } from "../ui/button"
+import { Pencil } from "lucide-react"
+import Link from "next/link"
+import { Invoice } from "@/app/api/types"
 
-export type Invoice = {
-  id: number,
-  transaction_id: string
-  customer_name: string
-  undiscounted_total: number
-  discounted_total: number
-  created_at: number
-  updated_at: number | null
-}
 
 const columnHelper = createColumnHelper<DataTableFeatures, Invoice>()
 
 const formatEpoch = (epoch: number) => new Date(epoch * 1000).toLocaleString()
 
 export const invoiceColumns = columnHelper.columns([
-  columnHelper.accessor("id", {
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Id" />
-    )
-  }),
   columnHelper.accessor("transaction_id", {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Transaction Id" />
@@ -62,7 +51,11 @@ export const invoiceColumns = columnHelper.columns([
   }),
   columnHelper.display({
     header: "Action",
-    cell: ({ row }) => <EditInvoiceDialog invoice={row.original} />,
+    cell: ({ row }) => (
+      <Button size="icon-sm" type="submit" render={<Link href={`/invoices/${row.original.id}`} />} nativeButton={false}>
+        <Pencil />
+      </Button>
+    )
   }),
 ])
 

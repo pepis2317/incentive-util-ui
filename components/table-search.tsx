@@ -4,13 +4,26 @@ import { useState } from "react"
 import { SearchIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
-export function TableSearch({ onSearch, defaultValue = "", }: { onSearch: (query: string) => void, defaultValue?: string }) {
+export function TableSearch({ query, defaultValue = "", }: { query: string, defaultValue?: string }) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [value, setValue] = useState(defaultValue)
-
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault()
-    onSearch(value.trim())
+    const search = value.trim()
+
+    const params = new URLSearchParams(searchParams.toString())
+    if (searchParams) {
+      params.set(query, search)
+    }
+    else {
+      params.delete(query)
+    }
+    params.set("page", "1")
+    router.push(`${pathname}?${params.toString()}`)
   }
 
   return (

@@ -4,18 +4,7 @@ import { createColumnHelper } from "@tanstack/react-table"
 import { EditItemDialog } from "./edit-item-dialog"
 import { DataTableFeatures } from "../data-table-features"
 import { DataTableColumnHeader } from "../data-table-column-header"
-
-export type Item = {
-  id: string
-  name: string
-  type: string
-  brand: string
-  unit: string
-  base_price: number
-  sell_price: number
-  created_at: number
-  updated_at: number | null
-}
+import { Item } from "@/app/api/types"
 
 const columnHelper = createColumnHelper<DataTableFeatures, Item>()
 

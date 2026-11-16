@@ -11,13 +11,16 @@ import {
   ComboboxList,
 } from "@/components/ui/combobox"
 import { DataTable } from "../data-table"
-import { createInvoiceColumns, RecordAddForm, RecordAddItem } from "./create-invoice-columns"
+import { createInvoiceColumns } from "./create-invoice-columns"
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form"
 import { recordAddSchema } from "./create-invoice-schema"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-
-const CUSTOMERS = ["C001", "C002", "C003"]
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { GetCustomersResponse, RecordAddForm, RecordAddItem } from "@/app/api/types"
+import { useRouter } from "next/navigation"
+import { toast, Toaster } from "../ui/toast"
+import { Spinner } from "../ui/spinner"
 
 const emptyItem: RecordAddItem = {
   item_id: "",
@@ -26,7 +29,18 @@ const emptyItem: RecordAddItem = {
   discounts: [],
 }
 
-export function CreateInvoiceForm({ onSuccess }: { onSuccess: () => void }) {
+export function useDebounce<T>(value: T, delay = 300) {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(t)
+  }, [value, delay])
+  return debounced
+}
+
+export function CreateInvoiceForm() {
+  const [isSubmitting, setSubmitting] = useState(false)
+  const [customerSearch, setCustomerSearch] = useState("")
   const form = useForm<RecordAddForm>({
     resolver: zodResolver(recordAddSchema),
     defaultValues: {
@@ -41,12 +55,20 @@ export function CreateInvoiceForm({ onSuccess }: { onSuccess: () => void }) {
     name: "items",
   })
 
+  const debouncedSearch = useDebounce(customerSearch, 300)
+  const { data: customersResponse = { customers: [] }, isLoading: customersLoading } = useQuery<GetCustomersResponse>({
+    queryKey: ["customers", debouncedSearch],
+    queryFn: () => fetch(`/api/customers?customer_query=${encodeURIComponent(debouncedSearch)}`).then((r) => r.json()),
+    placeholderData: keepPreviousData
+  })
+
   const columns = React.useMemo(
     () => createInvoiceColumns({ onRemove: remove }),
     [remove]
   )
 
-  const onValid = (data: RecordAddForm) => {
+  const router = useRouter()
+  const onValid = async (data: RecordAddForm) => {
     const payload = {
       ...data,
       items: data.items.map((item) => ({
@@ -57,8 +79,28 @@ export function CreateInvoiceForm({ onSuccess }: { onSuccess: () => void }) {
         }))
       }))
     }
-    // TODO: send `data` (matches RecordAdd) with a TanStack Query useMutation
-    onSuccess()
+    setSubmitting(true)
+    try {
+      const res = await fetch("/api/invoices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.error ?? "Failed to add customer");
+      }
+      setSubmitting(false)
+      router.push("/invoices")
+    } catch (e) {
+      console.error(e);
+      toast.add({
+        title: "Error",
+        description: e instanceof Error ? e.message : "Something went wrong. Please try again.",
+      });
+      setSubmitting(false)
+    }
   }
 
   const items = form.watch("items") ?? []
@@ -71,7 +113,7 @@ export function CreateInvoiceForm({ onSuccess }: { onSuccess: () => void }) {
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
-        <div className="space-y-2">
+        <div className="space-y-2 max-w-md">
           <Label htmlFor="transaction_id">Transaction Id</Label>
           <Input
             id="transaction_id"
@@ -80,24 +122,31 @@ export function CreateInvoiceForm({ onSuccess }: { onSuccess: () => void }) {
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 max-w-md">
           <Label>Customer Id</Label>
           <Controller
             control={form.control}
             name="customer_id"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <Combobox
-                items={CUSTOMERS}
+                items={customersResponse.customers}
                 value={field.value}
-                onValueChange={(v) => v && field.onChange(v)}
+                onValueChange={(v) => field.onChange(v ?? "")}
+                onInputValueChange={setCustomerSearch}
+                disabled={customersLoading}
               >
-                <ComboboxInput placeholder="Select Customer" className="w-full" />
+                <ComboboxInput
+                  placeholder="Select Customer"
+                  className="w-full"
+                  aria-invalid={fieldState.invalid}
+                  onBlur={field.onBlur}
+                />
                 <ComboboxContent>
                   <ComboboxEmpty>No customers found.</ComboboxEmpty>
                   <ComboboxList>
-                    {(c) => (
-                      <ComboboxItem key={c} value={c}>
-                        {c}
+                    {(i) => (
+                      <ComboboxItem key={i.id} value={i.id}>
+                        {i.id} {i.name}
                       </ComboboxItem>
                     )}
                   </ComboboxList>
@@ -106,9 +155,8 @@ export function CreateInvoiceForm({ onSuccess }: { onSuccess: () => void }) {
             )}
           />
         </div>
-
         <div className="space-y-2">
-          <DataTable columns={columns} data={fields} enablePagination={false} getRowId={(row) => row.item_id} />
+          <DataTable columns={columns} data={fields} enablePagination={false} getRowId={(row) => row.id} />
           {form.formState.errors.items?.root && (
             <p className="text-sm text-destructive">
               {form.formState.errors.items.root.message}
@@ -124,8 +172,12 @@ export function CreateInvoiceForm({ onSuccess }: { onSuccess: () => void }) {
           </Button>
         </div>
 
-        <Button type="submit">Save</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Spinner />}
+          {isSubmitting ? "Saving..." : "Save changes"}
+        </Button>
       </form>
+      <Toaster />
     </FormProvider>
   )
 }
