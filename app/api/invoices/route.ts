@@ -1,6 +1,6 @@
-import { editInvoiceSchema } from "@/components/invoices/edit-invoice-schema";
+import { deleteInvoiceSchema, editInvoiceSchema } from "@/components/invoices/edit-invoice-schema";
 import { NextResponse } from "next/server";
-import { addInvoice, editInvoice } from "../endpoints";
+import { addInvoice, deleteInvoice, editInvoice } from "../endpoints";
 import { recordAddSchema } from "@/components/invoices/create-invoice-schema";
 import { ApiError } from "../client";
 
@@ -52,5 +52,36 @@ export async function POST(request: Request) {
     }
     console.error(e);
     return NextResponse.json({ error: "Failed to add invoice" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const parsed = deleteInvoiceSchema.safeParse({
+    id: searchParams.get("id"),
+  });
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid request", issues: parsed.error.issues },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const response = await deleteInvoice(parsed.data.id);
+    return NextResponse.json(response);
+  } catch (e) {
+    if (e instanceof ApiError) {
+      return NextResponse.json(
+        { error: e.message, detail: e.detail },
+        { status: e.status ?? 500 }
+      );
+    }
+    console.error(e);
+    return NextResponse.json(
+      { error: "Failed to delete invoice" },
+      { status: 500 }
+    );
   }
 }

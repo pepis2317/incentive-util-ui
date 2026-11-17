@@ -18,7 +18,7 @@ import { Suspense } from "react"
 
 const items = [
   { title: "Home", href: "/", icon: Home },
-  { title: "Invoices", href: "/invoices", icon: ScrollText },
+  { title: "Create Invoice", href: "/create", icon: ScrollText },
   { title: "Customers", href: "/customers", icon: User },
   { title: "Items", href: "/items", icon: Package },
 ]

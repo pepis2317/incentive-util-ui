@@ -14,9 +14,9 @@ async function CustomerContent({ searchParams }: { searchParams: Promise<GetCust
   const data = await getCustomers(params)
   return (
     <div>
-      <div className="flex gap-2">
-        <TableSearch query="customer_query" />
+      <div className="space-y-2">
         <AddCustomerDialog />
+        <TableSearch query="customer_query" />
       </div>
       <DataTable columns={customerColumns} data={data.customers} rowCount={data.total} />
       <Toaster />

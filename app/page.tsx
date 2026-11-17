@@ -1,9 +1,71 @@
-import { Button } from "@/components/ui/button"
+import { AppBreadcrumb } from "@/components/app-breadcrumb";
+import { Suspense } from "react";
+import { getHome, getInvoices } from "./api/endpoints";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { GetInvoicesParams } from "./api/types";
+import { DataTable } from "@/components/data-table";
+import { Toaster } from "@/components/ui/toast";
+import { invoiceColumns } from "@/components/invoices/invoice-columns";
+import { TableSearch } from "@/components/table-search";
+import { InvoiceDateFilter } from "@/components/invoices/filter-invoices-popover";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Home() {
+async function HomeContent({ searchParams }: { searchParams: Promise<GetInvoicesParams> }) {
+  const summaryData = await getHome()
+  const monthName = new Date().toLocaleString("default", { month: "long" });
+
+  const params = await searchParams
+  const data = await getInvoices(params)
+  const stats = [
+    { label: `Total amount in ${monthName}`, value: `Rp.${summaryData.total_amount.toLocaleString()}` },
+    { label: `Total invoices in ${monthName}`, value: summaryData.total_invoices.toLocaleString() },
+    { label: `Total items in ${monthName}`, value: summaryData.total_quantity.toLocaleString() },
+  ];
   return (
-    <div className="flex min-h-svh items-center justify-center">
-      <Button>Click me</Button>
+    <div>
+      <div className="grid gap-4 md:grid-cols-3 mb-5">
+        {stats.map((stat) => (
+          <Card key={stat.label}>
+            <CardHeader>
+              <CardDescription>{stat.label}</CardDescription>
+              <CardTitle className="text-2xl tabular-nums">
+                {stat.value}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        ))}
+      </div>
+      <div className="space-y-2">
+        <Label>
+          Filter Invoices:
+        </Label>
+        <InvoiceDateFilter />
+        <TableSearch query="transaction_id_query" />
+      </div>
+      <DataTable columns={invoiceColumns} data={data.invoices} rowCount={data.total} />
+      <Toaster />
+    </div>
+
+  )
+}
+function HomeSkeleton() {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="w-xs h-10" />
+      <Skeleton className="w-full h-52" />
+      <Skeleton className="w-lg h-16" />
+      <Skeleton className="w-full h-52" />
+    </div>
+  )
+}
+export default function Home({ searchParams }: { searchParams: Promise<GetInvoicesParams> }) {
+  return (
+    <div>
+      <Suspense fallback={<HomeSkeleton />}>
+        <AppBreadcrumb />
+        <HomeContent searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 }

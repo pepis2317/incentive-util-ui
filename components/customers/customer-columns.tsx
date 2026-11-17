@@ -5,6 +5,7 @@ import { EditCustomerDialog } from "./edit-customer-dialog"
 import { DataTableFeatures } from "../data-table-features"
 import { DataTableColumnHeader } from "../data-table-column-header"
 import { Customer } from "@/app/api/types"
+import { format } from "date-fns"
 
 const columnHelper = createColumnHelper<DataTableFeatures, Customer>()
 
@@ -25,7 +26,7 @@ export const customerColumns = columnHelper.columns([
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created At" />
     ),
-    cell: (info) => formatEpoch(info.getValue())
+    cell: (info) => format(formatEpoch(info.getValue()), "LLL d, y, HH:mm")
   }),
   columnHelper.accessor("updated_at", {
     header: ({ column }) => (
@@ -33,7 +34,7 @@ export const customerColumns = columnHelper.columns([
     ),
     cell: (info) => {
       const value = info.getValue()
-      return value == null ? "-" : formatEpoch(value)
+      return value == null ? "-" : format(formatEpoch(value), "LLL d, y, HH:mm")
     },
   }),
   columnHelper.display({

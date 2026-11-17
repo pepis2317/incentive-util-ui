@@ -92,7 +92,7 @@ export function CreateInvoiceForm() {
         throw new Error(err?.error ?? "Failed to add customer");
       }
       setSubmitting(false)
-      router.push("/invoices")
+      router.push("/")
     } catch (e) {
       console.error(e);
       toast.add({

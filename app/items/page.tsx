@@ -14,9 +14,9 @@ async function ItemsContent({ searchParams }: { searchParams: Promise<GetItemPar
   const data = await getItems(params)
   return (
     <div>
-      <div className="flex gap-2">
-        <TableSearch query={"item_query"} />
+      <div className="space-y-2">
         <AddItemDialog />
+        <TableSearch query={"item_query"} />
       </div>
       <DataTable columns={itemColumns} data={data.items} rowCount={data.total} />
       <Toaster />

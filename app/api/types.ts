@@ -58,9 +58,10 @@ export type ItemResponse = {
   success: string
 }
 
-
 export type GetInvoicesParams = {
   transaction_id_query: string | null
+  from_date: string | null,
+  to_date: string | null,
   page: number
   page_size: number
 }
@@ -101,7 +102,6 @@ export type TransactionRecord = {
   item: Item
   price_snapshot: number
   updated_at: number | null
-  transaction_discount_snapshots: TransactionDiscountSnapshot[]
   discount_records: DiscountRecord[]
 }
 
@@ -115,16 +115,9 @@ export type DiscountRecord = {
   updated_at: number | null
 }
 
-export type TransactionDiscountSnapshot = {
-  transaction_record_id: number
-  created_at: number
-  id: number
-  discount_record_snapshots: DiscountRecordSnapshot[]
-}
-
 export type DiscountRecordSnapshot = {
   step: number
-  transaction_discount_snapshot_id: number
+  transaction_record_snapshot_id: number
   type: string
   id: number
   value: number
@@ -147,9 +140,9 @@ export type TransactionRecordSnapshot = {
   item: Item
   quantity: number
   invoice_snapshot_id: number
-  undiscounted_price: number
-  discounted_price: number
+  price_snapshot: number
   created_at: number
+  discount_record_snapshots: DiscountRecordSnapshot[]
 }
 
 export type GetTransactionRecordParams = {
@@ -163,6 +156,12 @@ export type TransactionRecordsResponse = {
 
 export type TransactionResponse = {
   success: string
+}
+
+export type GetHomeResponse = {
+  total_amount: number
+  total_quantity: number
+  total_invoices: number
 }
 
 export type AddItemRequest = z.infer<typeof editItemSchema>

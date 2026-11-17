@@ -80,7 +80,7 @@ export function DataTable<TData extends RowData>({
   })
 
   return (
-    <div className="rounded-md border mt-5">
+    <div className="rounded-md border">
       <Table className="table-fixed" style={{ width: table.getTotalSize() }}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

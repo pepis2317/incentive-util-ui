@@ -57,7 +57,7 @@ function EditInvoiceForm({ invoice, onSuccess }: { invoice: InvoiceResponse, onS
   })
   const debouncedSearch = useDebounce(customerSearch, 300)
   const { data: customersResponse = { customers: [] }, isLoading: customersLoading } = useQuery<GetCustomersResponse>({
-    queryKey: ["items", debouncedSearch],
+    queryKey: ["customers", debouncedSearch],
     queryFn: () => fetch(`/api/customers?customer_query=${encodeURIComponent(debouncedSearch)}`).then((r) => r.json()),
     placeholderData: keepPreviousData
   })

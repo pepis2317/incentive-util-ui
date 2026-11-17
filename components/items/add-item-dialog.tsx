@@ -26,7 +26,7 @@ export function AddItemDialog() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle></DialogTitle>
+          <DialogTitle>Add Item</DialogTitle>
         </DialogHeader>
         <AddItemForm onSuccess={() => setOpen(false)} />
       </DialogContent>

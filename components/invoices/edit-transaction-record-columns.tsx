@@ -5,6 +5,9 @@ import { DataTableColumnHeader } from "../data-table-column-header"
 import { DiscountRecordsCell } from "./discount-records-cell"
 import { DiscountRecord, TransactionRecord } from "@/app/api/types"
 import { EditTransactionDialog } from "./edit-transaction-dialog"
+import { format } from "date-fns"
+import { DeleteIcon } from "lucide-react"
+import { DeleteTransactionDialog } from "./delete-transaction-dialog"
 
 const columnHelper = createColumnHelper<DataTableFeatures, TransactionRecord>()
 
@@ -32,7 +35,8 @@ export const RecordColumns = columnHelper.columns([
   columnHelper.accessor("price_snapshot", {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Price Snapshot" />
-    )
+    ),
+    cell: ({ getValue }) => currencyFormatter.format(getValue()),
   }),
   columnHelper.accessor("quantity", {
     header: ({ column }) => (
@@ -43,11 +47,9 @@ export const RecordColumns = columnHelper.columns([
     id: "discount_records",
     header: "Discounts",
     cell: ({ row }) => (
-      <DiscountRecordsCell
-        discountRecords={row.original.discount_records}
-        transactionDiscountSnapshots={row.original.transaction_discount_snapshots} />
+      <DiscountRecordsCell discountRecords={row.original.discount_records} />
     ),
-    size: 300
+    size: 200
 
   }),
   columnHelper.accessor(
@@ -76,7 +78,7 @@ export const RecordColumns = columnHelper.columns([
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created At" />
     ),
-    cell: (info) => formatEpoch(info.getValue())
+    cell: (info) => format(formatEpoch(info.getValue()), "LLL d, y, HH:mm")
   }),
   columnHelper.accessor("updated_at", {
     header: ({ column }) => (
@@ -84,11 +86,15 @@ export const RecordColumns = columnHelper.columns([
     ),
     cell: (info) => {
       const value = info.getValue()
-      return value == null ? "-" : formatEpoch(value)
+      return value == null ? "-" : format(formatEpoch(value), "LLL d, y, HH:mm")
     },
   }),
   columnHelper.display({
     header: "Action",
-    cell: ({ row }) => <EditTransactionDialog transaction={row.original} />
+    cell: ({ row }) =>
+      <div className="space-x-2">
+        <EditTransactionDialog transaction={row.original} />
+        <DeleteTransactionDialog id={row.original.id} />
+      </div>
   })
 ])

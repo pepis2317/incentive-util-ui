@@ -1,4 +1,4 @@
-import { DiscountRecord, TransactionDiscountSnapshot } from "@/app/api/types";
+import { DiscountRecord } from "@/app/api/types";
 
 const currencyFormatter = new Intl.NumberFormat("id-ID", {
   maximumFractionDigits: 0
@@ -19,8 +19,7 @@ const formatDiscount = (index: number, discountRecord: DiscountRecord) => {
   return `${separator}${formattedValue}`;
 }
 
-export function DiscountRecordsCell({ discountRecords }:
-  { discountRecords: DiscountRecord[], transactionDiscountSnapshots: TransactionDiscountSnapshot[] }) {
+export function DiscountRecordsCell({ discountRecords }: { discountRecords: DiscountRecord[] }) {
   return (
     <div className="flex gap-2">
       <span>

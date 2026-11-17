@@ -5,3 +5,7 @@ export const editInvoiceSchema = z.object({
   customer_id: z.string().min(1, "Select a customer"),
   transaction_id: z.string().min(1, "Required"),
 })
+
+export const deleteInvoiceSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});

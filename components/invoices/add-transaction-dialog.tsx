@@ -24,7 +24,7 @@ export function AddTransactionDialog({ invoiceId }: { invoiceId: number }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button size="sm" />}>
         <Pencil />
-        Add new transaction item
+        Add new item
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
