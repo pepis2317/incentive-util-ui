@@ -16,6 +16,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from "../ui/card
 import { ScrollArea } from "../ui/scroll-area";
 import { Spinner } from "../ui/spinner";
 import { toast, Toaster } from "../ui/toast";
+import { Badge } from "../ui/badge";
 
 export function EditTransactionDialog({ transaction }: { transaction: TransactionRecord }) {
   const [open, setOpen] = useState(false)
@@ -219,7 +220,7 @@ function EditTransactionForm({ transaction, onSuccess }: { transaction: Transact
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
         <div className="space-y-2">
-          <Label>Item</Label>
+          <Label>Item Id</Label>
           <Controller
             control={form.control}
             name="item_id"
@@ -242,7 +243,10 @@ function EditTransactionForm({ transaction, onSuccess }: { transaction: Transact
                   <ComboboxList>
                     {(i) => (
                       <ComboboxItem key={i.id} value={i.id}>
-                        {i.id} {i.name}
+                        <Badge variant="outline">
+                          {i.id}
+                        </Badge>
+                        {i.name}
                       </ComboboxItem>
                     )}
                   </ComboboxList>

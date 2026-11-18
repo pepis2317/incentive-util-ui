@@ -190,7 +190,6 @@ function AddTransactionForm({ invoiceId, onSuccess }: { invoiceId: number, onSuc
       setSubmitting(false)
       onSuccess();
     } catch (e) {
-      console.error(e);
       toast.add({
         title: "Error",
         description: e instanceof Error ? e.message : "Something went wrong. Please try again.",

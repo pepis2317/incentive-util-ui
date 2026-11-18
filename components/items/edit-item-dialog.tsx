@@ -143,10 +143,12 @@ function EditItemForm({ item, onSuccess }: { item: Item, onSuccess: () => void }
           />
         </div>
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Spinner />}
-          {isSubmitting ? "Saving..." : "Save changes"}
-        </Button>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting && <Spinner />}
+            {isSubmitting ? "Saving..." : "Save changes"}
+          </Button>
+        </div>
       </form>
       <Toaster />
     </FormProvider>

@@ -14,6 +14,7 @@ import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { toast, Toaster } from "../ui/toast";
 import { Spinner } from "../ui/spinner";
+import { Badge } from "../ui/badge";
 
 export function EditInvoiceDialog({ invoice }: { invoice: InvoiceResponse }) {
   const [open, setOpen] = useState(false)
@@ -104,11 +105,15 @@ function EditInvoiceForm({ invoice, onSuccess }: { invoice: InvoiceResponse, onS
           <Input
             id="transaction_id"
             aria-invalid={!!form.formState.errors.transaction_id}
-            {...form.register("transaction_id")}
+            {...form.register("transaction_id", {
+              onChange: (e) => {
+                e.target.value = e.target.value.toUpperCase()
+              },
+            })}
           />
         </div>
         <div className="space-y-2">
-          <Label>Customer</Label>
+          <Label>Customer Id</Label>
           <Controller
             control={form.control}
             name="customer_id"
@@ -131,7 +136,10 @@ function EditInvoiceForm({ invoice, onSuccess }: { invoice: InvoiceResponse, onS
                   <ComboboxList>
                     {(i) => (
                       <ComboboxItem key={i.id} value={i.id}>
-                        {i.id} {i.name}
+                        <Badge variant="outline">
+                          {i.id}
+                        </Badge>
+                        {i.name}
                       </ComboboxItem>
                     )}
                   </ComboboxList>

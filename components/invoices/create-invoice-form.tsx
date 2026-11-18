@@ -21,6 +21,7 @@ import { GetCustomersResponse, RecordAddForm, RecordAddItem } from "@/app/api/ty
 import { useRouter } from "next/navigation"
 import { toast, Toaster } from "../ui/toast"
 import { Spinner } from "../ui/spinner"
+import { Badge } from "../ui/badge"
 
 const emptyItem: RecordAddItem = {
   item_id: "",
@@ -94,7 +95,6 @@ export function CreateInvoiceForm() {
       setSubmitting(false)
       router.push("/")
     } catch (e) {
-      console.error(e);
       toast.add({
         title: "Error",
         description: e instanceof Error ? e.message : "Something went wrong. Please try again.",
@@ -118,7 +118,12 @@ export function CreateInvoiceForm() {
           <Input
             id="transaction_id"
             aria-invalid={!!form.formState.errors.transaction_id}
-            {...form.register("transaction_id")}
+            className="uppercase"
+            {...form.register("transaction_id", {
+              onChange: (e) => {
+                e.target.value = e.target.value.toUpperCase()
+              },
+            })}
           />
         </div>
 
@@ -146,7 +151,10 @@ export function CreateInvoiceForm() {
                   <ComboboxList>
                     {(i) => (
                       <ComboboxItem key={i.id} value={i.id}>
-                        {i.id} {i.name}
+                        <Badge variant="outline">
+                          {i.id}
+                        </Badge>
+                        {i.name}
                       </ComboboxItem>
                     )}
                   </ComboboxList>

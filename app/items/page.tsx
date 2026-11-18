@@ -17,8 +17,8 @@ async function ItemsContent({ searchParams }: { searchParams: Promise<GetItemPar
       <div className="space-y-2">
         <AddItemDialog />
         <TableSearch query={"item_query"} />
+        <DataTable columns={itemColumns} data={data.items} rowCount={data.total} />
       </div>
-      <DataTable columns={itemColumns} data={data.items} rowCount={data.total} />
       <Toaster />
     </div>
   )

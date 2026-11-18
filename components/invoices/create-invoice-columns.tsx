@@ -24,6 +24,7 @@ export function createInvoiceColumns({
       header: "Item Id",
       cell: ({ row }) => <ItemComboBoxCell index={row.index} />,
       enableSorting: false,
+      size: 250
     }),
     columnHelper.accessor("item_quantity", {
       header: "Qty",

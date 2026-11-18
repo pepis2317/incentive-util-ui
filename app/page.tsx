@@ -37,13 +37,10 @@ async function HomeContent({ searchParams }: { searchParams: Promise<GetInvoices
         ))}
       </div>
       <div className="space-y-2">
-        <Label>
-          Filter Invoices:
-        </Label>
         <InvoiceDateFilter />
         <TableSearch query="transaction_id_query" />
+        <DataTable columns={invoiceColumns} data={data.invoices} rowCount={data.total} />
       </div>
-      <DataTable columns={invoiceColumns} data={data.invoices} rowCount={data.total} />
       <Toaster />
     </div>
 

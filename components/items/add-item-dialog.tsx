@@ -89,7 +89,11 @@ function AddItemForm({ onSuccess }: { onSuccess: () => void }) {
           <Input
             id="id"
             aria-invalid={!!form.formState.errors.id}
-            {...form.register("id")}
+            {...form.register("id", {
+              onChange: (e) => {
+                e.target.value = e.target.value.toUpperCase()
+              },
+            })}
           />
         </div>
         <div className="space-y-2">
@@ -143,10 +147,12 @@ function AddItemForm({ onSuccess }: { onSuccess: () => void }) {
           />
         </div>
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Spinner />}
-          {isSubmitting ? "Saving..." : "Add new item"}
-        </Button>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting && <Spinner />}
+            {isSubmitting ? "Saving..." : "Add new item"}
+          </Button>
+        </div>
       </form>
       <Toaster />
     </FormProvider>

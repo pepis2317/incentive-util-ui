@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/toast";
 import { AlertTriangle, ReceiptText } from "lucide-react";
 import { Suspense } from "react"
@@ -58,9 +59,21 @@ async function InvoiceContent({ params, searchParams }: { params: Promise<{ id: 
       <div className="space-y-2">
         <DataTable columns={RecordColumns} data={data.invoice.transaction_records} enablePagination={false} />
         <AddTransactionDialog invoiceId={idNumber} />
-        <InvoiceChangesButton changes={data.invoice.invoice_snapshots} />
+        {data.invoice.invoice_snapshots.length > 0 && (
+          <InvoiceChangesButton changes={data.invoice.invoice_snapshots} />
+        )}
       </div>
       <Toaster />
+    </div>
+  )
+}
+
+function EditInvoiceSkeleton() {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="w-xs h-10" />
+      <Skeleton className="w-xs h-32" />
+      <Skeleton className="w-full h-32" />
     </div>
   )
 }
@@ -68,7 +81,7 @@ async function InvoiceContent({ params, searchParams }: { params: Promise<{ id: 
 export default async function EditInvoice({ params, searchParams }: { params: Promise<{ id: string }>, searchParams: Promise<GetTransactionRecordParams> }) {
   return (
     <div>
-      <Suspense fallback={<p>Loading...</p>}>
+      <Suspense fallback={<EditInvoiceSkeleton />}>
         <AppBreadcrumb />
         <InvoiceContent params={params} searchParams={searchParams} />
       </Suspense>

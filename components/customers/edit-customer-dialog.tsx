@@ -42,7 +42,6 @@ function EditCustomerForm({ customer, onSuccess }: { customer: Customer, onSucce
     defaultValues: {
       id: customer.id,
       name: customer.name,
-      type_id: customer.type_id
     }
   })
 
@@ -51,7 +50,6 @@ function EditCustomerForm({ customer, onSuccess }: { customer: Customer, onSucce
   const onValid = async (data: EditCustomerRequest) => {
     const payload = {
       id: data.id,
-      type_id: data.type_id,
       name: data.name
     }
     setSubmitting(true)
@@ -96,10 +94,12 @@ function EditCustomerForm({ customer, onSuccess }: { customer: Customer, onSucce
           />
         </div>
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Spinner />}
-          {isSubmitting ? "Saving..." : "Save changes"}
-        </Button>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting && <Spinner />}
+            {isSubmitting ? "Saving..." : "Save changes"}
+          </Button>
+        </div>
       </form>
       <Toaster />
     </FormProvider>

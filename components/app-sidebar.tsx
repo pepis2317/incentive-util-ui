@@ -7,7 +7,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  useSidebar,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
@@ -30,6 +29,7 @@ function SidebarNav() {
     <SidebarMenu>
       {items.map((item) => (
         <SidebarMenuButton
+          size="lg"
           key={item.href}
           isActive={pathname === item.href}
           render={<Link href={item.href} />}
@@ -47,6 +47,7 @@ function SidebarNavFallback() {
     <SidebarMenu>
       {items.map((item) => (
         <SidebarMenuButton
+          size="lg"
           key={item.href}
           render={<Link href={item.href} />}
         >
@@ -61,7 +62,6 @@ function SidebarNavFallback() {
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarHeader>{/* your header */}</SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>

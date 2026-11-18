@@ -45,7 +45,6 @@ function AddCustomerForm({ onSuccess }: { onSuccess: () => void }) {
   const onValid = async (data: AddCustomerRequest) => {
     const payload = {
       id: data.id,
-      type_id: data.type_id,
       name: data.name
     }
     setSubmitting(true)
@@ -85,7 +84,11 @@ function AddCustomerForm({ onSuccess }: { onSuccess: () => void }) {
           <Input
             id="id"
             aria-invalid={!!form.formState.errors.id}
-            {...form.register("id")}
+            {...form.register("id", {
+              onChange: (e) => {
+                e.target.value = e.target.value.toUpperCase()
+              },
+            })}
           />
         </div>
 
@@ -98,10 +101,12 @@ function AddCustomerForm({ onSuccess }: { onSuccess: () => void }) {
           />
         </div>
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Spinner />}
-          {isSubmitting ? "Saving..." : "Add new customer"}
-        </Button>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting && <Spinner />}
+            {isSubmitting ? "Saving..." : "Add new customer"}
+          </Button>
+        </div>
       </form>
       <Toaster />
     </FormProvider>

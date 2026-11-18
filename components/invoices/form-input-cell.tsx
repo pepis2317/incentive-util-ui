@@ -4,6 +4,7 @@ import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, 
 import { useEffect, useState } from "react"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { GetItemsResponse, Item, RecordAddForm } from "@/app/api/types"
+import { Badge } from "../ui/badge"
 
 type ItemField = "item_id" | "item_quantity" | "price_snapshot"
 
@@ -85,7 +86,10 @@ export function ItemComboBoxCell({ index }: { index: number }) {
               <ComboboxList>
                 {(i) => (
                   <ComboboxItem key={i.id} value={i}>
-                    {i.id} {i.name}
+                    <Badge variant="outline">
+                      {i.id}
+                    </Badge>
+                    {i.name}
                   </ComboboxItem>
                 )}
               </ComboboxList>

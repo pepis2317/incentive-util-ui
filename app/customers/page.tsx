@@ -17,8 +17,8 @@ async function CustomerContent({ searchParams }: { searchParams: Promise<GetCust
       <div className="space-y-2">
         <AddCustomerDialog />
         <TableSearch query="customer_query" />
+        <DataTable columns={customerColumns} data={data.customers} rowCount={data.total} />
       </div>
-      <DataTable columns={customerColumns} data={data.customers} rowCount={data.total} />
       <Toaster />
     </div>
   )
