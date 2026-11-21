@@ -1,6 +1,7 @@
 import { editCustomerSchema } from "@/components/customers/create-edit-customer-schema"
 import { addTransactionSchema } from "@/components/invoices/add-transaction-schema"
-import { recordAddSchema } from "@/components/invoices/create-invoice-schema"
+import { invoiceAddSchema } from "@/components/invoices/create-invoice-schema"
+import { editAddItemSchema } from "@/components/invoices/edit-add-item-schema"
 import { editInvoiceSchema } from "@/components/invoices/edit-invoice-schema"
 import { addDiscountSchema, editDiscountSchema, editTransactionSchema } from "@/components/invoices/edit-transaction-schema"
 import { editItemSchema } from "@/components/items/create-edit-item-schema"
@@ -54,12 +55,29 @@ export type GetItemsResponse = {
   page: number
 }
 
+export type GetItemNameParams = {
+  id: string
+}
+
+export type GetItemNameResponse = {
+  item_name: string
+}
+
+export type GetCustomerNameParams = {
+  id: string
+}
+
+export type GetCustomerNameResponse = {
+  customer_name: string
+}
+
 export type ItemResponse = {
   success: string
 }
 
 export type GetInvoicesParams = {
   transaction_id_query: string | null
+  type: string,
   from_date: string | null,
   to_date: string | null,
   page: number
@@ -159,9 +177,8 @@ export type TransactionResponse = {
 }
 
 export type GetHomeResponse = {
-  total_amount: number
-  total_quantity: number
-  total_invoices: number
+  total_sell_out_amount: number
+  total_sell_in_amount: number
 }
 
 export type AddItemRequest = z.infer<typeof editItemSchema>
@@ -172,7 +189,8 @@ export type EditInvoiceRequest = z.infer<typeof editInvoiceSchema>
 export type EditTransactionRequest = z.infer<typeof editTransactionSchema>
 export type AddDiscountRow = z.infer<typeof addDiscountSchema>
 export type DiscountEditRow = z.infer<typeof editDiscountSchema>
-export type RecordAddForm = z.infer<typeof recordAddSchema>
-export type RecordAddItem = RecordAddForm["items"][number]
-export type ItemDiscount = RecordAddItem["discounts"][number]
+export type InvoiceAddForm = z.infer<typeof invoiceAddSchema>
+export type InvoiceAddItem = InvoiceAddForm["items"][number]
+export type ItemDiscount = InvoiceAddItem["discounts"][number]
 export type AddTransactionRequest = z.infer<typeof addTransactionSchema>
+export type EditAddItemModel = z.infer<typeof editAddItemSchema>

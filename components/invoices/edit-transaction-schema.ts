@@ -29,6 +29,7 @@ export const editTransactionSchema = z.object({
   discounts_to_add: z.array(addDiscountSchema)
 })
 
+
 export const deleteTransactionSchema = z.object({
   id: z.coerce.number().int().positive(),
 });

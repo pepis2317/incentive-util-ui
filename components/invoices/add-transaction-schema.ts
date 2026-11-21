@@ -20,5 +20,12 @@ export const addTransactionSchema = z.object({
   price_snapshot: z.number().int().nonnegative(),
   quantity: z.number().int().positive(),
   discounts: z.array(addTransactionDiscount)
+})
 
+export const createTransactionSchema = z.object({
+  invoice_id: z.number(),
+  item_id: z.string().trim().min(1, "Required"),
+  price_snapshot: z.number().int().nonnegative(),
+  quantity: z.number().int().positive(),
+  discounts: z.array(addTransactionDiscount)
 })

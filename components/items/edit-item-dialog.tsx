@@ -7,19 +7,20 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Pencil } from "lucide-react"
 import { EditItemRequest, Item } from "@/app/api/types"
-import { FormProvider, useForm } from "react-hook-form"
+import { Controller, FormProvider, useForm } from "react-hook-form"
 import { toast, Toaster } from "../ui/toast"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { editItemSchema } from "./create-edit-item-schema"
 import { Spinner } from "../ui/spinner"
+import { ScrollArea } from "../ui/scroll-area"
 
 export function EditItemDialog({ item }: { item: Item }) {
   const [open, setOpen] = useState(false)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button size="icon-sm" />}>
+      <DialogTrigger render={<Button size="icon-lg" className="w-12 h-12" />}>
         <Pencil />
       </DialogTrigger>
       <DialogContent>
@@ -91,65 +92,99 @@ function EditItemForm({ item, onSuccess }: { item: Item, onSuccess: () => void }
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
-          <Input
-            id="name"
-            aria-invalid={!!form.formState.errors.name}
-            {...form.register("name")}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="type">Type</Label>
-          <Input
-            id="type"
-            aria-invalid={!!form.formState.errors.type}
-            {...form.register("type")}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="brand">Brand</Label>
-          <Input
-            id="brand"
-            aria-invalid={!!form.formState.errors.brand}
-            {...form.register("brand")}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="unit">Unit</Label>
-          <Input
-            id="unit"
-            aria-invalid={!!form.formState.errors.unit}
-            {...form.register("unit")}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="base_price">Base Price</Label>
-          <Input
-            id="base_price"
-            type="number"
-            aria-invalid={!!form.formState.errors.base_price}
-            {...form.register("base_price", { valueAsNumber: true })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="type">Sell Price</Label>
-          <Input
-            id="sell_price"
-            type="number"
-            aria-invalid={!!form.formState.errors.sell_price}
-            {...form.register("sell_price", { valueAsNumber: true })}
-          />
-        </div>
 
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting && <Spinner />}
-            {isSubmitting ? "Saving..." : "Save changes"}
-          </Button>
-        </div>
-      </form>
+      <ScrollArea className=" max-h-[500px] pe-4">
+        <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              aria-invalid={!!form.formState.errors.name}
+              {...form.register("name")}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="type">Type</Label>
+            <Input
+              id="type"
+              aria-invalid={!!form.formState.errors.type}
+              {...form.register("type")}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="brand">Brand</Label>
+            <Input
+              id="brand"
+              aria-invalid={!!form.formState.errors.brand}
+              {...form.register("brand")}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="unit">Unit</Label>
+            <Input
+              id="unit"
+              aria-invalid={!!form.formState.errors.unit}
+              {...form.register("unit")}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="base_price">Base Price</Label>
+            <Controller
+              control={form.control}
+              name="base_price"
+              render={({ field, fieldState }) => (
+                <Input
+                  id="base_price"
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="0"
+                  aria-invalid={fieldState.invalid}
+                  name={field.name}
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                  value={field.value === 0 ? "" : field.value}
+                  onChange={(e) => {
+                    const raw = e.target.value
+                    field.onChange(raw === "" ? 0 : Number(raw))
+                  }}
+                />
+              )}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="type">Sell Price</Label>
+            <Controller
+              control={form.control}
+              name="sell_price"
+              render={({ field, fieldState }) => (
+                <Input
+                  id="sell_price"
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="0"
+                  aria-invalid={fieldState.invalid}
+                  name={field.name}
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                  value={field.value === 0 ? "" : field.value}
+                  onChange={(e) => {
+                    const raw = e.target.value
+                    field.onChange(raw === "" ? 0 : Number(raw))
+                  }}
+                />
+              )}
+            />
+          </div>
+
+          <div className="flex justify-end">
+            <Button className="h-12" type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Spinner />}
+              {isSubmitting ? "Saving..." : "Save changes"}
+            </Button>
+          </div>
+        </form>
+      </ScrollArea>
+
       <Toaster />
     </FormProvider>
   )

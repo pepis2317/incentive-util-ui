@@ -20,7 +20,7 @@ export function EditInvoiceDialog({ invoice }: { invoice: InvoiceResponse }) {
   const [open, setOpen] = useState(false)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button size="icon-sm" />}>
+      <DialogTrigger render={<Button size="icon-lg" />}>
         <Pencil />
       </DialogTrigger>
       <DialogContent>
@@ -57,13 +57,15 @@ function EditInvoiceForm({ invoice, onSuccess }: { invoice: InvoiceResponse, onS
     }
   })
   const debouncedSearch = useDebounce(customerSearch, 300)
-  const { data: customersResponse = { customers: [] }, isLoading: customersLoading } = useQuery<GetCustomersResponse>({
+  const { data: customersResponse = { customers: [] }, isFetching: customersFetching } = useQuery<GetCustomersResponse>({
     queryKey: ["customers", debouncedSearch],
     queryFn: () => fetch(`/api/customers?customer_query=${encodeURIComponent(debouncedSearch)}`).then((r) => r.json()),
     placeholderData: keepPreviousData
   })
+  const isCustomersSearching = customersFetching || customerSearch != debouncedSearch
   const router = useRouter()
   const onValid = async (data: EditInvoiceRequest) => {
+    console.log(data)
     const payload = {
       id: data.id,
       transaction_id: data.transaction_id,
@@ -113,45 +115,62 @@ function EditInvoiceForm({ invoice, onSuccess }: { invoice: InvoiceResponse, onS
           />
         </div>
         <div className="space-y-2">
-          <Label>Customer Id</Label>
+          <Label>Customer</Label>
           <Controller
             control={form.control}
             name="customer_id"
-            render={({ field, fieldState }) => (
-              <Combobox
-                items={customersResponse.customers}
-                value={field.value}
-                onValueChange={(v) => field.onChange(v ?? "")}
-                onInputValueChange={setCustomerSearch}
-                disabled={customersLoading}
-              >
-                <ComboboxInput
-                  placeholder="Select Item"
-                  className="w-full"
-                  aria-invalid={fieldState.invalid}
-                  onBlur={field.onBlur}
-                />
-                <ComboboxContent>
-                  <ComboboxEmpty>No customers found.</ComboboxEmpty>
-                  <ComboboxList>
-                    {(i) => (
-                      <ComboboxItem key={i.id} value={i.id}>
-                        <Badge variant="outline">
-                          {i.id}
-                        </Badge>
-                        {i.name}
-                      </ComboboxItem>
-                    )}
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
-            )}
+            render={({ field, fieldState }) => {
+              const current =
+                customersResponse.customers.find((i) => i.id === field.value) ?? null
+              return (
+                <Combobox
+                  items={customersResponse.customers}
+                  value={current}
+                  isItemEqualToValue={(a, b) => a.id === b.id}
+                  itemToStringLabel={(i) => i.name}
+                  filter={null}
+                  onValueChange={(v) => {
+                    field.onChange(v ?? null)
+                    if (v) {
+                      form.setValue("customer_id", v.id, { shouldDirty: true, shouldValidate: true })
+                    }
+                  }}
+                  onInputValueChange={(text, details) => {
+                    if (details.reason === "input-change") setCustomerSearch(text)
+                  }}
+                >
+                  <ComboboxInput
+                    placeholder="Select Item"
+                    className="w-full h-12"
+                    aria-invalid={fieldState.invalid}
+                    onBlur={field.onBlur}
+                  />
+                  <ComboboxContent>
+                    <ComboboxEmpty>
+                      {isCustomersSearching ? <Spinner /> : <span> No customers found. </span>}
+                    </ComboboxEmpty>
+                    <ComboboxList>
+                      {(i) => (
+                        <ComboboxItem className="min-h-12 flex flex-col gap-1 border items-start p-5" key={i.id} value={i}>
+                          <Badge variant="outline">
+                            {i.id}
+                          </Badge>
+                          {i.name}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
+              )
+            }}
           />
         </div>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Spinner />}
-          {isSubmitting ? "Saving..." : "Save changes"}
-        </Button>
+        <div className="flex justify-end">
+          <Button type="submit" className="h-12" disabled={isSubmitting}>
+            {isSubmitting && <Spinner />}
+            {isSubmitting ? "Saving..." : "Save changes"}
+          </Button>
+        </div>
       </form>
       <Toaster />
     </FormProvider>

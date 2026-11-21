@@ -35,7 +35,7 @@ export function TableSearch({ query, defaultValue = "", }: { query: string, defa
         onChange={(e) => setValue(e.target.value)}
         className="max-w-sm"
       />
-      <Button type="submit">
+      <Button className="min-w-12 h-12" type="submit">
         <SearchIcon />
       </Button>
     </form>

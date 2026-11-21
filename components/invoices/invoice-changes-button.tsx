@@ -7,7 +7,6 @@ import { InvoiceSnapshot } from "@/app/api/types"
 import { DataTable } from "../data-table"
 import { invoiceChangesColumns } from "./invoice-changes-columns"
 import { format } from "date-fns"
-import { Label } from "../ui/label"
 import { Badge } from "../ui/badge"
 
 export function InvoiceChangesButton({ changes }: { changes: InvoiceSnapshot[] }) {
@@ -15,18 +14,17 @@ export function InvoiceChangesButton({ changes }: { changes: InvoiceSnapshot[] }
   const sortedChanges = [...changes].sort((a, b) => b.created_at - a.created_at)
   const formatEpoch = (epoch: number) => new Date(epoch * 1000).toLocaleString()
   return (
-    <div>
-      <Button className="cursor-pointer" variant="outline" onClick={() => setOpen(!open)}>
+    <div className="w-full flex flex-col items-end">
+      <Button className="h-12" variant="outline" onClick={() => setOpen(!open)}>
         <AlertTriangle />
-        View changes
+        View previous changes
       </Button>
-      <div className={`space-y-5 mt-5 ${open ? "block" : "hidden"}`}>
+      <div className={`space-y-10 w-full mt-4 ${open ? "block" : "hidden"}`}>
         {sortedChanges.map((change, index) => (
           <div className="space-y-2" key={index}>
             <div className="space-y-2" key={index}>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Clock className="size-4 text-muted-foreground" />
                   <span className="text-sm font-medium">
                     Snapshot at {format(formatEpoch(change.created_at), "LLL d, y, HH:mm")}
                   </span>

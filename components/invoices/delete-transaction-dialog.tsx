@@ -44,7 +44,8 @@ export function DeleteTransactionDialog({ id }: { id: number }) {
         render={
           <Button
             variant="destructive"
-            size="icon-sm"
+            size="icon-lg"
+            className="min-w-12 h-12"
             aria-label="Delete transaction"
           />
         }

@@ -19,7 +19,7 @@ export function EditCustomerDialog({ customer }: { customer: Customer }) {
   const [open, setOpen] = useState(false)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button size="icon-sm" />}>
+      <DialogTrigger render={<Button size="icon-lg" className="w-12 h-12" />}>
         <Pencil />
       </DialogTrigger>
       <DialogContent>
@@ -95,7 +95,7 @@ function EditCustomerForm({ customer, onSuccess }: { customer: Customer, onSucce
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
+          <Button className="h-12" type="submit" disabled={isSubmitting}>
             {isSubmitting && <Spinner />}
             {isSubmitting ? "Saving..." : "Save changes"}
           </Button>

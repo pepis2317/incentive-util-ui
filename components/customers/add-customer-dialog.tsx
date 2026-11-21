@@ -20,7 +20,7 @@ export function AddCustomerDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button />}>
+      <DialogTrigger render={<Button className="h-12" />}>
         <User />
         Add Customer
       </DialogTrigger>

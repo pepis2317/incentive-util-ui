@@ -1,7 +1,7 @@
 import { deleteInvoiceSchema, editInvoiceSchema } from "@/components/invoices/edit-invoice-schema";
 import { NextResponse } from "next/server";
 import { addInvoice, deleteInvoice, editInvoice } from "../endpoints";
-import { recordAddSchema } from "@/components/invoices/create-invoice-schema";
+import { invoiceAddSchema } from "@/components/invoices/create-invoice-schema";
 import { ApiError } from "../client";
 
 export async function PUT(request: Request) {
@@ -31,7 +31,7 @@ export async function PUT(request: Request) {
 
 export async function POST(request: Request) {
   const json = await request.json();
-  const parsed = recordAddSchema.safeParse(json);
+  const parsed = invoiceAddSchema.safeParse(json);
 
   if (!parsed.success) {
     return NextResponse.json(

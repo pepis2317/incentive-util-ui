@@ -20,7 +20,7 @@ export default async function CreateInvoice() {
       <Suspense fallback={<CreateInvoiceSkeleton />}>
         <div>
           <AppBreadcrumb />
-          <CreateInvoiceForm />
+          <CreateInvoiceForm type={"sell_out"} />
         </div>
       </Suspense>
       <Toaster />

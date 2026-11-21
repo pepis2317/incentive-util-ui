@@ -5,7 +5,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { CalendarIcon } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import type { DateRange } from "react-day-picker"
-import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import {
@@ -13,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Button } from "../ui/button"
 
 export function InvoiceDateFilter() {
   const router = useRouter()
@@ -55,7 +55,7 @@ export function InvoiceDateFilter() {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger render={<Button className="w-fit" variant="outline" />}>
+      <PopoverTrigger render={<Button size="lg" className="min-w-12 h-12" variant="outline" />}>
         <CalendarIcon />
         {range?.from ? (
           range.to ? (

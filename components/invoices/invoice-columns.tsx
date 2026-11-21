@@ -23,8 +23,7 @@ export const invoiceColumns = columnHelper.columns([
   columnHelper.accessor("transaction_id", {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Transaction Id" />
-    ),
-    size: 200
+    )
   }),
   columnHelper.accessor("customer_name", {
     header: ({ column }) => (
@@ -64,8 +63,8 @@ export const invoiceColumns = columnHelper.columns([
   columnHelper.display({
     header: "Action",
     cell: ({ row }) => (
-      <div className="space-x-2">
-        <Button size="icon-sm" type="submit" render={<Link href={`/${row.original.id}`} />} nativeButton={false}>
+      <div className="space-x-3">
+        <Button size="icon-lg" className="min-w-12 h-12" type="submit" render={<Link href={`/${row.original.id}`} />} nativeButton={false}>
           <Pencil />
         </Button>
         <DeleteInvoiceDialog id={row.original.id} />

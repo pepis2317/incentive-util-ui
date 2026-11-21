@@ -8,6 +8,9 @@ import { DiscountRecordsCell } from "./discount-records-cell"
 
 const columnHelper = createColumnHelper<DataTableFeatures, TransactionRecordSnapshot>()
 
+const currencyFormatter = new Intl.NumberFormat("id-ID", {
+  maximumFractionDigits: 0
+})
 
 export const invoiceChangesColumns = columnHelper.columns([
   columnHelper.accessor("item.name", {
@@ -18,7 +21,8 @@ export const invoiceChangesColumns = columnHelper.columns([
   columnHelper.accessor("price_snapshot", {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Price Snapshot" />
-    )
+    ),
+    cell: ({ getValue }) => currencyFormatter.format(getValue()),
   }),
   columnHelper.accessor("quantity", {
     header: ({ column }) => (

@@ -9,6 +9,10 @@ import { format } from "date-fns"
 
 const columnHelper = createColumnHelper<DataTableFeatures, Item>()
 
+const currencyFormatter = new Intl.NumberFormat("id-ID", {
+  maximumFractionDigits: 0
+})
+
 const formatEpoch = (epoch: number) => new Date(epoch * 1000).toLocaleString()
 
 export const itemColumns = columnHelper.columns([
@@ -39,8 +43,9 @@ export const itemColumns = columnHelper.columns([
   }),
   columnHelper.accessor("sell_price", {
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Price" />
-    )
+      <DataTableColumnHeader column={column} title="Sell Price" />
+    ),
+    cell: ({ getValue }) => currencyFormatter.format(getValue())
   }),
   columnHelper.accessor("created_at", {
     header: ({ column }) => (

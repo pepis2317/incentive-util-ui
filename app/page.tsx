@@ -8,7 +8,6 @@ import { Toaster } from "@/components/ui/toast";
 import { invoiceColumns } from "@/components/invoices/invoice-columns";
 import { TableSearch } from "@/components/table-search";
 import { InvoiceDateFilter } from "@/components/invoices/filter-invoices-popover";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 
 async function HomeContent({ searchParams }: { searchParams: Promise<GetInvoicesParams> }) {
@@ -16,16 +15,16 @@ async function HomeContent({ searchParams }: { searchParams: Promise<GetInvoices
   const monthName = new Date().toLocaleString("default", { month: "long" });
 
   const params = await searchParams
-  const data = await getInvoices(params)
-  const stats = [
-    { label: `Total amount in ${monthName}`, value: `Rp.${summaryData.total_amount.toLocaleString()}` },
-    { label: `Total invoices in ${monthName}`, value: summaryData.total_invoices.toLocaleString() },
-    { label: `Total items in ${monthName}`, value: summaryData.total_quantity.toLocaleString() },
+  const data = await getInvoices({ ...params, type: "sell_out" })
+  const large_stats = [
+    { label: `Total sell in amount in ${monthName}`, value: `Rp.${summaryData.total_sell_in_amount.toLocaleString()}` },
+    { label: `Total sell out amount in ${monthName}`, value: `Rp.${summaryData.total_sell_out_amount.toLocaleString()}` },
+    { label: `Profit`, value: `Rp.${(summaryData.total_sell_out_amount - summaryData.total_sell_in_amount).toLocaleString()}` },
   ];
   return (
     <div>
       <div className="grid gap-4 md:grid-cols-3 mb-5">
-        {stats.map((stat) => (
+        {large_stats.map((stat) => (
           <Card key={stat.label}>
             <CardHeader>
               <CardDescription>{stat.label}</CardDescription>
@@ -43,7 +42,6 @@ async function HomeContent({ searchParams }: { searchParams: Promise<GetInvoices
       </div>
       <Toaster />
     </div>
-
   )
 }
 function HomeSkeleton() {

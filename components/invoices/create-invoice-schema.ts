@@ -6,18 +6,20 @@ export const itemDiscountSchema = z.object({
   discount_step: z.number().int().min(1),
 })
 
-export const recordAddSchema = z.object({
+export const invoiceAddItemSchema = z.object({
+  item_name: z.string().trim().min(1, "Required"),
+  item_id: z.string().trim().min(1, "Required"),
+  item_quantity: z.number().int().positive(),
+  price_snapshot: z.number().int().nonnegative(),
+  discounts: z.array(itemDiscountSchema),
+})
+
+export const invoiceAddSchema = z.object({
+  customer_name: z.string(),
   customer_id: z.string().min(1, "Select a customer"),
-  transaction_id: z.string().min(1, "Required"),
-  items: z
-    .array(
-      z.object({
-        item_id: z.string().trim().min(1, "Required"),
-        item_quantity: z.number().int().positive(),
-        price_snapshot: z.number().int().nonnegative(),
-        discounts: z.array(itemDiscountSchema),
-      })
-    )
+  transaction_id: z.string().min(1).nullable(),
+  type: z.string().min(1, "Required"),
+  items: z.array(invoiceAddItemSchema)
     .min(1, "Add at least one item")
     .superRefine((items, ctx) => {
       const seen = new Map<string, number>()

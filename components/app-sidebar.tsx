@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Package, ScrollText, User } from "lucide-react"
+import { Home, Package, ScrollText, Truck, User } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -18,6 +18,7 @@ import { Suspense } from "react"
 const items = [
   { title: "Home", href: "/", icon: Home },
   { title: "Create Invoice", href: "/create", icon: ScrollText },
+  { title: "Sell In", href: "/sell-in", icon: Truck },
   { title: "Customers", href: "/customers", icon: User },
   { title: "Items", href: "/items", icon: Package },
 ]

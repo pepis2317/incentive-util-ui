@@ -1,15 +1,45 @@
 import { api } from "./client";
-import { AddCustomerRequest, AddItemRequest, AddTransactionRequest, CustomerResponse, EditCustomerRequest, EditInvoiceRequest, EditItemRequest, EditTransactionRequest, GetCustomerParams, GetCustomersResponse, GetHomeResponse, GetInvoicesParams, GetInvoicesResponse, GetItemParams, GetItemsResponse, GetTransactionRecordParams, InvoiceResponse, ItemResponse, RecordAddForm, TransactionRecordsResponse, TransactionResponse } from "./types";
+import {
+  AddCustomerRequest,
+  AddItemRequest,
+  AddTransactionRequest,
+  CustomerResponse,
+  EditCustomerRequest,
+  EditInvoiceRequest,
+  EditItemRequest,
+  EditTransactionRequest,
+  GetCustomerParams,
+  GetCustomersResponse,
+  GetHomeResponse,
+  GetInvoicesParams,
+  GetInvoicesResponse,
+  GetItemParams,
+  GetItemsResponse,
+  GetTransactionRecordParams,
+  InvoiceResponse,
+  ItemResponse,
+  InvoiceAddForm,
+  TransactionRecordsResponse,
+  TransactionResponse,
+  GetItemNameParams,
+  GetItemNameResponse,
+  GetCustomerNameParams,
+  GetCustomerNameResponse
+} from "./types";
 
 export const getCustomers = (params: GetCustomerParams) =>
   api.get<GetCustomersResponse>("/customers", { params })
 export const editCustomer = (body: EditCustomerRequest) =>
   api.put<CustomerResponse>("/customers", body)
+export const getCustomerName = (params: GetCustomerNameParams) =>
+  api.get<GetCustomerNameResponse>("/customers/get-name", { params })
 export const addCustomer = (body: AddCustomerRequest) =>
   api.post<CustomerResponse>("/customers", body)
 
 export const getItems = (params: GetItemParams) =>
   api.get<GetItemsResponse>("/items", { params })
+export const getItemName = (params: GetItemNameParams) =>
+  api.get<GetItemNameResponse>("/items/get-name", { params })
 export const addItem = (body: AddItemRequest) =>
   api.post<ItemResponse>("/items", body)
 export const editItem = (body: EditItemRequest) =>
@@ -23,7 +53,7 @@ export const addTransaction = (body: AddTransactionRequest) =>
   api.put<TransactionResponse>("/invoices/add-transaction-record-item", body)
 export const editInvoice = (body: EditInvoiceRequest) =>
   api.put<InvoiceResponse>("/invoices", body)
-export const addInvoice = (body: RecordAddForm) =>
+export const addInvoice = (body: InvoiceAddForm) =>
   api.post<InvoiceResponse>("/invoices", body)
 export const deleteTransaction = (id: number) =>
   api.delete<TransactionResponse>("/transaction-records", { params: { id } })
